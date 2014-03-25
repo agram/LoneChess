@@ -22,7 +22,7 @@ class Mybouton
 		//var a = new h2d.Bitmap(fg, mcSelected);
 		//a.x = -5;
 		//a.y = -5;
-		//
+		
 		var font = Res.Minecraftia.build(8, { antiAliasing : false } );
 		var texte = new h2d.Text(font, mcSelected);
 		texte.color = new h3d.Vector();

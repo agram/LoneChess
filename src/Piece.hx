@@ -7,22 +7,20 @@ class Piece extends Ent
 	public var type:TypePiece;
 	public var selected:Bool;
 	public var owned:Bool;
-	var testLibre:Bool;
 	
 	public function new(type:TypePiece, i, j) {
 		super(i * Const.TS, j * Const.TS);
 		this.type = type;
 		this.i = i;
 		this.j = j;
-		testLibre = false;
 
 		var inter = new h2d.Interactive(64, 64, this);
 		inter.enableRightButton = true;
 		inter.onClick = function (e) { 
-			if(e.button == 0) {
+			if (e.button == 0) {
 				for (p in game.riddle.pieces) {
 					p.reset();
-					if(ownable(p)) {
+					if (ownable(p)) {
 						p.owned = true;
 						p.anim.play(switch (p.type) {
 							case PION : game.gfx.pieces.pion.owned;
@@ -48,13 +46,14 @@ class Piece extends Ent
 				if (owned) {
 					for (p in game.riddle.pieces) {
 						if (p.selected) {
-							p.i = i;
-							p.j = j;
-							p.x = x;
-							p.y = y;
+							p.i = this.i;
+							p.j = this.j;
+							p.x = this.x;
+							p.y = this.y;
+							game.riddle.pieces.remove(this);
 							kill();
 						}
-						p.reset();					
+						p.reset();		
 					}
 				}
 			}
@@ -94,8 +93,6 @@ class Piece extends Ent
 
 	public function deplacementPrise () {
 		// le mieux reste de faire une fonction par type de piece
-		testLibre = true;
-		
 		var tab = switch(type) {
 			case PION : prisePion();
 			case TOUR : priseTour();
@@ -104,20 +101,17 @@ class Piece extends Ent
 			case ROI : priseRoi();
 			case REINE : priseReine();
 		}
-		
 		return finalize(tab);
 	}
 	
 	function ownable(p:Piece) {
-		testLibre = false;
-
 		var tab = switch(type) {
 			case PION : prisePionNormal();
-			case TOUR : priseTour();
-			case CAVALIER : priseCavalier();
-			case FOU : priseFou();
-			case ROI : priseRoi();
-			case REINE : priseReine();
+			case TOUR : priseTourNormal();
+			case CAVALIER : priseCavalierNormal();
+			case FOU : priseFouNormal();
+			case ROI : priseRoiNormal();
+			case REINE : priseReineNormal();
 		}
 		
 		for (t in tab) if (t.i == p.i && t.j == p.j) return true;
@@ -126,8 +120,6 @@ class Piece extends Ent
 	}
 	
 	function libre(i, j) {
-		if (!testLibre) return true;
-		
 		for (t in game.riddle.pieces) if (t.i == i && t.j == j) return false;
 		return true;
 	}
@@ -135,9 +127,18 @@ class Piece extends Ent
 	function test(tab, i, j) {
 		if (i >= 0 && i < 4 
 		&& j >= 0 && j < 4 
-		&& libre(i, j ) ) {
+		&& libre(i, j) ) {
 			tab.push( { i:i, j:j } );
 			return true;
+		}
+		return false;
+	}
+	
+	function testNormal(tab, i, j) {
+		if (i >= 0 && i < 4 
+		&& j >= 0 && j < 4) {
+			tab.push( { i:i, j:j } );
+			return libre(i, j);
 		}
 		return false;
 	}
@@ -163,8 +164,8 @@ class Piece extends Ent
 	function prisePionNormal() {
 		var tab = [];
 
-		test(tab, i - 1, j - 1);
-		test(tab, i + 1, j - 1);
+		testNormal(tab, i - 1, j - 1);
+		testNormal(tab, i + 1, j - 1);
 		
 		return tab;
 	}
@@ -191,6 +192,28 @@ class Piece extends Ent
 		return tab;
 	}
 	
+	function priseTourNormal() {
+		var tab = [];
+
+		if (testNormal(tab, i - 1, j))
+			if (testNormal(tab, i - 2, j))
+				testNormal(tab, i - 3, j);
+		
+		if (testNormal(tab, i + 1, j))
+			if (testNormal(tab, i + 2, j))
+				testNormal(tab, i + 3, j);
+		
+		if (testNormal(tab, i, j - 1))
+			if (testNormal(tab, i, j - 2))
+				testNormal(tab, i, j - 3);
+		
+		if (testNormal(tab, i, j + 1))
+			if (testNormal(tab, i, j + 2))
+				testNormal(tab, i, j + 3);
+				
+		return tab;
+	}
+	
 	function priseCavalier() {
 		var tab = [];
 		
@@ -202,6 +225,21 @@ class Piece extends Ent
 		test(tab, i + 1, j + 2);
 		test(tab, i - 1, j + 2);
 		test(tab, i - 2, j + 1);
+
+		return tab;
+	}
+	
+	function priseCavalierNormal() {
+		var tab = [];
+		
+		testNormal(tab, i - 2, j - 1);
+		testNormal(tab, i - 1, j - 2);
+		testNormal(tab, i + 1, j - 2);
+		testNormal(tab, i + 2, j - 1);
+		testNormal(tab, i + 2, j + 1);
+		testNormal(tab, i + 1, j + 2);
+		testNormal(tab, i - 1, j + 2);
+		testNormal(tab, i - 2, j + 1);
 
 		return tab;
 	}
@@ -228,6 +266,28 @@ class Piece extends Ent
 		return tab;
 	}
 	
+	function priseFouNormal() {
+		var tab = [];
+
+		if (testNormal(tab, i - 1, j - 1))
+			if (testNormal(tab, i - 2, j - 2))
+				testNormal(tab, i - 3, j - 3);
+		
+		if (testNormal(tab, i + 1, j - 1))
+			if (testNormal(tab, i + 2, j - 2))
+				testNormal(tab, i + 3, j - 3);
+		
+		if (testNormal(tab, i - 1, j + 1))
+			if (testNormal(tab, i - 2, j + 2))
+				testNormal(tab, i - 3, j + 3);
+		
+		if (testNormal(tab, i + 1, j + 1))
+			if (testNormal(tab, i + 2, j + 2))
+				testNormal(tab, i + 3, j + 3);
+		
+		return tab;
+	}
+	
 	function priseRoi() {
 		var tab = [];
 
@@ -239,6 +299,21 @@ class Piece extends Ent
 		test(tab, i + 1, j);
 		test(tab, i, j - 1);
 		test(tab, i, j + 1);
+
+		return tab;
+	}
+	
+	function priseRoiNormal() {
+		var tab = [];
+
+		testNormal(tab, i - 1, j - 1);
+		testNormal(tab, i + 1, j - 1);
+		testNormal(tab, i - 1, j + 1);
+		testNormal(tab, i + 1, j + 1);
+		testNormal(tab, i - 1, j);
+		testNormal(tab, i + 1, j);
+		testNormal(tab, i, j - 1);
+		testNormal(tab, i, j + 1);
 
 		return tab;
 	}
@@ -281,8 +356,46 @@ class Piece extends Ent
 		return tab;
 	}
 	
+	function priseReineNormal() {
+		var tab = [];
+
+		if (testNormal(tab, i - 1, j))
+			if (testNormal(tab, i - 2, j))
+				testNormal(tab, i - 3, j);
+		
+		if (testNormal(tab, i + 1, j))
+			if (testNormal(tab, i + 2, j))
+				testNormal(tab, i + 3, j);
+		
+		if (testNormal(tab, i, j - 1))
+			if (testNormal(tab, i, j - 2))
+				testNormal(tab, i, j - 3);
+		
+		if (testNormal(tab, i, j + 1))
+			if (testNormal(tab, i, j + 2))
+				testNormal(tab, i, j + 3);
+		
+		if (testNormal(tab, i - 1, j - 1))
+			if (testNormal(tab, i - 2, j - 2))
+				testNormal(tab, i - 3, j - 3);
+		
+		if (testNormal(tab, i + 1, j - 1))
+			if (testNormal(tab, i + 2, j - 2))
+				testNormal(tab, i + 3, j - 3);
+		
+		if (testNormal(tab, i - 1, j + 1))
+			if (testNormal(tab, i - 2, j + 2))
+				testNormal(tab, i - 3, j + 3);
+		
+		if (testNormal(tab, i + 1, j + 1))
+			if (testNormal(tab, i + 2, j + 2))
+				testNormal(tab, i + 3, j + 3);
+
+		return tab;
+	}
+	
 	override public function kill() {
-		game.riddle.pieces.remove(this);
+		//game.riddle.pieces.remove(this);
 		super.kill();
 	}
 }

@@ -27,6 +27,27 @@ class Riddle
 		if (nbPiece > 10) nbPiece = 10;
 		this.nbPiece = nbPiece;
 		
+		listeRandom = [
+			PION, PION, PION, PION, PION, PION, PION, PION, PION, PION, PION, 
+			TOUR, TOUR, TOUR, TOUR, 
+			CAVALIER, CAVALIER, CAVALIER, CAVALIER, CAVALIER, CAVALIER, CAVALIER, CAVALIER, CAVALIER, CAVALIER, CAVALIER, 
+			FOU, FOU, FOU, FOU, FOU, FOU, FOU, FOU, FOU, FOU, FOU, 
+			ROI, ROI, 
+			REINE,
+		];
+	}
+	
+	public function clone() {
+		var r = new Riddle(nbPiece);
+		r.pieces = pieces.copy();
+		return r;
+	}
+	
+	public function show() {
+		for (p in Game.inst.riddle.pieces) p.reset();
+	}
+	
+	public function generate() {
 		listePiecesPossibles = {
 			pion1:false,
 			pion2:false,
@@ -40,37 +61,19 @@ class Riddle
 			reine:false,
 		};
 		
-		listeRandom = [
-			PION, PION, PION, PION, PION, PION, PION, PION, 
-			TOUR, TOUR, TOUR, TOUR, 
-			CAVALIER, CAVALIER, CAVALIER, CAVALIER, CAVALIER, CAVALIER, CAVALIER, CAVALIER, 
-			FOU, FOU, FOU, FOU, FOU, FOU, FOU, FOU, 
-			ROI, ROI, 
-			//REINE,
-		];
-	}
-	
-	public function clone() {
-		var r = new Riddle(nbPiece);
-		r.pieces = pieces.copy();
-		return r;
-	}
-	
-	public function generate() {
-		
 		var compteur = 1;
 		pieces = [];
 		var i = Std.random(4);
 		var j = Std.random(4);
+
 		var firstPiece = new Piece(choosePiece(i, j), i, j);
 
 		while (true) {
 			pieces.push(firstPiece);
+			if (compteur++ >= nbPiece) return true;
 			
 			var chosen = pieces[Std.random(pieces.length)];
 			var save = { i:chosen.i, j:chosen.j };
-			
-			if (compteur++ >= nbPiece) return true;
 			
 			// On deplace la piece que l'on vient de poser en fonction de sa prise
 			// s'il n'y a aucune possibilité, on arrete tout et on recommence.
@@ -87,10 +90,11 @@ class Riddle
 	function choosePiece(i, j) {
 		var listPiece = haxe.EnumTools.createAll(TypePiece);
 		
+		//return listeRandom[Std.random(listeRandom.length)];
+		
 		var couleur = (i + j) % 2; // 0 vaut blanc, 1 vaut noir (pour les fous)
 		while (true) {
 			var a = listeRandom[Std.random(listeRandom.length)];
-
 			switch(a) {
 			case PION: 
 				if (!listePiecesPossibles.pion1) {
@@ -98,7 +102,7 @@ class Riddle
 					return PION;
 				}
 				else if (!listePiecesPossibles.pion2) {
-					listePiecesPossibles.pion1 = true;
+					listePiecesPossibles.pion2 = true;
 					return PION;
 				}
 			case TOUR: 
@@ -141,5 +145,4 @@ class Riddle
 			}
 		}
 	}
-
 }

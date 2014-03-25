@@ -1,5 +1,5 @@
 -cp src
--swf LoneChess
+-swf LoneChess.swf
 -swf-header 800:600:60:FFFFFF
 -swf-version 11.6
 -main Game.hx

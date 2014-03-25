@@ -87,7 +87,7 @@ class Ent extends h2d.Sprite
 			destroy();
 	}
 	
-	function destroy()
+	public function destroy()
 	{
 		dead = true;
 		death = 1;

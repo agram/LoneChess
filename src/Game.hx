@@ -74,7 +74,7 @@ class Game extends hxd.App
 	
 	var chess:Array<h2d.Bitmap>;
 	public var riddle:Riddle;
-	public var riddleSave:Riddle;
+	public var riddleSave:Array<{type:TypePiece, i:Int, j:Int}>;
 	
 	override function init() {
 		s2d.setFixedSize(Const.WIDTH, Const.HEIGHT);
@@ -109,15 +109,18 @@ class Game extends hxd.App
 		}
 		
 		riddle = new Riddle(6);
-		while (!riddle.generate()) for (p in riddle.pieces) p.kill();
+		generate();
 		
-		for (p in riddle.pieces) p.reset();
+		riddle.show();
 		
-		riddleSave = riddle.clone();
+		save();
 		
 		var a = new Mybouton(20, 'Recommencer');
 		a.interactive.onClick = function (_) { 
-			trace('recommencer');
+			for (p in riddle.pieces) p.kill();
+			riddle.pieces = [];
+			for (p in riddleSave) riddle.pieces.push(new Piece(p.type, p.i, p.j));
+			riddle.show();
 		}
 		var a = new Mybouton(50, 'Annuler');
 		a.interactive.onClick = function (_) { 
@@ -125,9 +128,31 @@ class Game extends hxd.App
 		}
 		var a = new Mybouton(80, 'Nouveau');
 		a.interactive.onClick = function (_) { 
-			trace('Nouveau');
+			for (p in riddle.pieces) p.kill();
+			riddle.pieces = [];
+			generate();
+			riddle.show();
+			save();
 		}
 		
+	}
+	
+	function generate () {
+		while (!riddle.generate()) {
+			for (p in riddle.pieces) p.kill();
+			riddle.pieces = [];
+		}
+	}
+	
+	function save() {
+		riddleSave = [];
+		for (p in riddle.pieces) {
+			riddleSave.push({
+				type: p.type,
+				i: p.i, 
+				j: p.j
+			});
+		}
 	}
 	
 	override function update( dt : Float ) {}
