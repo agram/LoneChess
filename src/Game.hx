@@ -129,7 +129,7 @@ class Game extends hxd.App
 			//trace('Annuler');
 			//a.mcSelected.alpha = 0.6;
 		//}
-		var a = new Mybouton(80, 'Nouveau');
+		var a = new Mybouton(60, 'Nouveau');
 		a.interactive.onRelease = function (_) { 
 			for (p in riddle.pieces) p.kill();
 			riddle.pieces = [];
@@ -152,12 +152,12 @@ class Game extends hxd.App
 			}
 		}
 		
-		var font = Res.Minecraftia.build(8, { antiAliasing : false } );
+		var font = Res.Minecraftia.build(7, { antiAliasing : false } );
 		var texte = new h2d.Text(font);
 		texte.color = new h3d.Vector();
 		texte.x = 265;
-		texte.y = 150;
-		texte.text = 'Tu dois prendre une\npièce à chaque\ndéplacement.\nTu gagnes quand il\nne reste plus qu\'une \npièce.\nLes rois et les \nreines ne peuvent\nprendre qu\'une fois.';
+		texte.y = 100;
+		texte.text = 'Clic Gauche pour \nsélectionner\nClic Droit pour \nprendre\n\nTu dois prendre une\npièce à chaque\ndéplacement.\nTu gagnes quand il\nne reste plus qu\'une \npièce.\nLes rois et les \nreines ne peuvent\nprendre qu\'une fois.';
 		boardUi.addChild(texte);
 		
 	}
