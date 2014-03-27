@@ -49,12 +49,14 @@ class Game extends hxd.App
 				normalNoir: Array<h2d.Tile>,
 				select: Array<h2d.Tile>,
 				owned: Array<h2d.Tile>,
+				hasTaken: Array<h2d.Tile>,
 			},
 			reine: {
 				normalBlanc: Array<h2d.Tile>,
 				normalNoir: Array<h2d.Tile>,
 				select: Array<h2d.Tile>,
 				owned: Array<h2d.Tile>,
+				hasTaken: Array<h2d.Tile>,
 			},
 		},
 		chess: {
@@ -65,7 +67,6 @@ class Game extends hxd.App
 		},
 		message: {
 			main: Array<h2d.Tile>,
-			statsTroup: Array<h2d.Tile>,
 		},
 	};
 	
@@ -116,24 +117,48 @@ class Game extends hxd.App
 		save();
 		
 		var a = new Mybouton(20, 'Recommencer');
-		a.interactive.onClick = function (_) { 
+		a.interactive.onRelease = function (_) { 
 			for (p in riddle.pieces) p.kill();
 			riddle.pieces = [];
 			for (p in riddleSave) riddle.pieces.push(new Piece(p.type, p.i, p.j));
 			riddle.show();
+			a.mcSelected.alpha = 0.6;
 		}
-		var a = new Mybouton(50, 'Annuler');
-		a.interactive.onClick = function (_) { 
-			trace('Annuler');
-		}
+		//var a = new Mybouton(50, 'Annuler');
+		//a.interactive.onRelease = function (_) { 
+			//trace('Annuler');
+			//a.mcSelected.alpha = 0.6;
+		//}
 		var a = new Mybouton(80, 'Nouveau');
-		a.interactive.onClick = function (_) { 
+		a.interactive.onRelease = function (_) { 
 			for (p in riddle.pieces) p.kill();
 			riddle.pieces = [];
 			generate();
 			riddle.show();
 			save();
+			a.mcSelected.alpha = 0.6;
 		}
+		
+		for (i in 3...10) {
+			var a = new Mybouton.MyNumero(i * 30 - 80, '' + i);
+			a.interactive.onRelease = function (_) { 
+				riddle.nbPiece = i;
+				for (p in riddle.pieces) p.kill();
+				riddle.pieces = [];
+				generate();
+				riddle.show();
+				save();
+				a.mcSelected.alpha = 0.6;
+			}
+		}
+		
+		var font = Res.Minecraftia.build(8, { antiAliasing : false } );
+		var texte = new h2d.Text(font);
+		texte.color = new h3d.Vector();
+		texte.x = 265;
+		texte.y = 150;
+		texte.text = 'Tu dois prendre une\npièce à chaque\ndéplacement.\nTu gagnes quand il\nne reste plus qu\'une \npièce.\nLes rois et les \nreines ne peuvent\nprendre qu\'une fois.';
+		boardUi.addChild(texte);
 		
 	}
 	
@@ -142,6 +167,7 @@ class Game extends hxd.App
 			for (p in riddle.pieces) p.kill();
 			riddle.pieces = [];
 		}
+		for (p in riddle.pieces) p.hasTaken = false;
 	}
 	
 	function save() {
@@ -192,12 +218,14 @@ class Game extends hxd.App
 					normalNoir: Tools.split(tileGfx, 4, 5, 1, w, h),
 					select: Tools.split(tileGfx, 4, 2, 1, w, h),
 					owned: Tools.split(tileGfx, 4, 3, 1, w, h),
+					hasTaken: Tools.split(tileGfx, 4, 4, 1, w, h),
 				},
 				reine: {
 					normalBlanc: Tools.split(tileGfx, 5, 0, 1, w, h),
 					normalNoir: Tools.split(tileGfx, 5, 5, 1, w, h),
 					select: Tools.split(tileGfx, 5, 2, 1, w, h),
 					owned: Tools.split(tileGfx, 5, 3, 1, w, h),
+					hasTaken: Tools.split(tileGfx, 5, 4, 1, w, h),
 				},
 			},
 			chess: {
@@ -207,8 +235,7 @@ class Game extends hxd.App
 				rouge: Tools.split(tileGfx, 3, 1, 1, w, h),
 			},
 			message: {
-				main: Tools.split(tileGfx, 0, 1, 1, 24, 24),
-				statsTroup: Tools.split(tileGfx, 1, 1, 1, 24, 24),
+				main: Tools.split(tileGfx, 0, 11, 1, 24, 24),
 			},
 		};
 		

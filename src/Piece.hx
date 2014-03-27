@@ -7,6 +7,8 @@ class Piece extends Ent
 	public var type:TypePiece;
 	public var selected:Bool;
 	public var owned:Bool;
+	public var canTakeOnce:Bool;
+	public var hasTaken:Bool;
 	
 	public function new(type:TypePiece, i, j) {
 		super(i * Const.TS, j * Const.TS);
@@ -18,6 +20,8 @@ class Piece extends Ent
 		inter.enableRightButton = true;
 		inter.onClick = function (e) { 
 			if (e.button == 0) {
+				if (hasTaken) return;
+				
 				for (p in game.riddle.pieces) {
 					p.reset();
 					if (ownable(p)) {
@@ -44,7 +48,7 @@ class Piece extends Ent
 			}
 			else {
 				if (owned) {
-					for (p in game.riddle.pieces) {
+					for (p in game.riddle.pieces.copy()) {
 						if (p.selected) {
 							p.i = this.i;
 							p.j = this.j;
@@ -52,17 +56,39 @@ class Piece extends Ent
 							p.y = this.y;
 							game.riddle.pieces.remove(this);
 							kill();
+							switch(p.type) {
+								case ROI, REINE :
+									p.hasTaken = true;
+								default:
+							}
 						}
-						p.reset();		
+						p.reset();
+					}
+					
+					if (game.riddle.pieces.length == 1) {
+						var m = new Message();
+						m.texte.text = 'Gagné !';
 					}
 				}
 			}
 		};
+		canTakeOnce = switch(type) {
+			case ROI, REINE: true;
+			default: false;
+		}
+		hasTaken = false;
 	}
 	
 	public function reset () {
 
-		if ( (i + j) % 2 == 1 ) {
+		if (hasTaken) {
+			switch(type) {
+				case ROI : anim.play(game.gfx.pieces.roi.hasTaken);
+				case REINE : anim.play(game.gfx.pieces.reine.hasTaken);
+				default:
+			}
+		}
+		else if ( (i + j) % 2 == 1 ) {
 			anim.play(switch (type) {
 				case PION : game.gfx.pieces.pion.normalBlanc;
 				case TOUR : game.gfx.pieces.tour.normalBlanc;

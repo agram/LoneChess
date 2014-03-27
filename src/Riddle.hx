@@ -2,7 +2,7 @@ import Common;
 
 class Riddle
 {
-	var nbPiece:Int;
+	public var nbPiece:Int;
 	public var pieces:Array<Piece>; // liste des pieces en jeu sur l'echiquier
 	public var listePiecesPossibles: {
 		pion1:Bool,
@@ -72,12 +72,21 @@ class Riddle
 			pieces.push(firstPiece);
 			if (compteur++ >= nbPiece) return true;
 			
-			var chosen = pieces[Std.random(pieces.length)];
+			var chosen:Piece;
+			chosen = pieces[0];
+			while (true) {
+				chosen = pieces[Std.random(pieces.length)];
+				if (!chosen.hasTaken) break;
+			}
 			var save = { i:chosen.i, j:chosen.j };
 			
 			// On deplace la piece que l'on vient de poser en fonction de sa prise
 			// s'il n'y a aucune possibilité, on arrete tout et on recommence.
-			if (!chosen.deplacementPrise()) return false;
+			if (!chosen.hasTaken && !chosen.deplacementPrise()) return false;
+			chosen.hasTaken = switch(chosen.type) {
+				case ROI, REINE: true;
+				default: false;
+			}
 
 			chosen.x = chosen.i * 64;
 			chosen.y = chosen.j * 64;
@@ -89,8 +98,6 @@ class Riddle
 	
 	function choosePiece(i, j) {
 		var listPiece = haxe.EnumTools.createAll(TypePiece);
-		
-		//return listeRandom[Std.random(listeRandom.length)];
 		
 		var couleur = (i + j) % 2; // 0 vaut blanc, 1 vaut noir (pour les fous)
 		while (true) {

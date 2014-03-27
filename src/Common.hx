@@ -9,3 +9,8 @@ enum TypePiece {
 	ROI;
 	REINE;
 }
+
+enum TypeButton {
+	ACTION; 
+	NUMERO;
+}
