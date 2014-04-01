@@ -1,6 +1,6 @@
 -cp src
 -swf LoneChess.swf
 -swf-header 800:600:60:FFFFFF
--swf-version 11.6
--main Game.hx
+-swf-version 11.9
+-main Titre.hx
 -lib h3d

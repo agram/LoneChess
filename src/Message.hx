@@ -6,17 +6,17 @@ class Message extends h2d.ScaleGrid
 	public var i:h2d.Interactive;
 	var game:Game;
 
-	public function new() 
+	public function new(width, height) 
 	{
 		game = Game.inst;
 		super(game.gfx.message.main[0], 8, 8);
 		visible = true;
 		colorKey = 0xFFFFFFFF;
-		width = 100;
-		height = 40;
+		this.width = width;
+		this.height = height;
 		
-		x = Const.WIDTH / 2 - 50;
-		y = Const.HEIGHT / 2 - 20;
+		x = Const.WIDTH / 2 - width / 2;
+		y = Const.HEIGHT / 2 - height / 2;
 		
 		var font = Res.Minecraftia.build(12, { antiAliasing : false } );
 		texte = new h2d.Text(font);

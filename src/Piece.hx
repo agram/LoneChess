@@ -17,36 +17,15 @@ class Piece extends Ent
 		this.j = j;
 
 		var inter = new h2d.Interactive(64, 64, this);
-		inter.enableRightButton = true;
 		inter.onClick = function (e) { 
 			if (e.button == 0) {
 				if (hasTaken) return;
 				
-				for (p in game.riddle.pieces) {
-					p.reset();
-					if (ownable(p)) {
-						p.owned = true;
-						p.anim.play(switch (p.type) {
-							case PION : game.gfx.pieces.pion.owned;
-							case TOUR : game.gfx.pieces.tour.owned;
-							case CAVALIER : game.gfx.pieces.cavalier.owned;
-							case FOU : game.gfx.pieces.fou.owned;
-							case ROI : game.gfx.pieces.roi.owned;
-							case REINE : game.gfx.pieces.reine.owned;
-						} );
-					}
+				if (selected) {
+					for (p in game.riddle.pieces) p.reset();
+					return;
 				}
-				selected = true;
-				anim.play(switch (type) {
-					case PION : game.gfx.pieces.pion.select;
-					case TOUR : game.gfx.pieces.tour.select;
-					case CAVALIER : game.gfx.pieces.cavalier.select;
-					case FOU : game.gfx.pieces.fou.select;
-					case ROI : game.gfx.pieces.roi.select;
-					case REINE : game.gfx.pieces.reine.select;
-				} );
-			}
-			else {
+				
 				if (owned) {
 					for (p in game.riddle.pieces.copy()) {
 						if (p.selected) {
@@ -66,9 +45,34 @@ class Piece extends Ent
 					}
 					
 					if (game.riddle.pieces.length == 1) {
-						var m = new Message();
+						var m = new Message(100, 40);
 						m.texte.text = 'Gagné !';
 					}
+				}
+				else {
+					for (p in game.riddle.pieces) {
+						p.reset();
+						if (ownable(p)) {
+							p.owned = true;
+							p.anim.play(switch (p.type) {
+								case PION : game.gfx.pieces.pion.owned;
+								case TOUR : game.gfx.pieces.tour.owned;
+								case CAVALIER : game.gfx.pieces.cavalier.owned;
+								case FOU : game.gfx.pieces.fou.owned;
+								case ROI : game.gfx.pieces.roi.owned;
+								case REINE : game.gfx.pieces.reine.owned;
+							} );
+						}
+					}
+					selected = true;
+					anim.play(switch (type) {
+						case PION : game.gfx.pieces.pion.select;
+						case TOUR : game.gfx.pieces.tour.select;
+						case CAVALIER : game.gfx.pieces.cavalier.select;
+						case FOU : game.gfx.pieces.fou.select;
+						case ROI : game.gfx.pieces.roi.select;
+						case REINE : game.gfx.pieces.reine.select;
+					} );
 				}
 			}
 		};

@@ -10,9 +10,9 @@ class Mybouton
 	{
 		game = Game.inst;
 		
-		mcSelected = new h2d.Graphics(game.boardUi);
+		mcSelected = new h2d.Graphics(game.board);
 		mcSelected.beginFill(0xFF978E7E);
-		mcSelected.drawRect(0, 0, 100, 20);
+		mcSelected.drawRect(0, 0, 70, 20);
 		mcSelected.alpha = 1;
 		mcSelected.endFill();
 		mcSelected.x = 280;
@@ -49,13 +49,13 @@ class MyNumero
 	{
 		game = Game.inst;
 		
-		mcSelected = new h2d.Graphics(game.boardUi);
+		mcSelected = new h2d.Graphics(game.boardSettings);
 		mcSelected.beginFill(0xFF978E7E);
 		mcSelected.drawRect(0, 0, 15, 15);
 		mcSelected.alpha = 1;
 		mcSelected.endFill();
 		mcSelected.x = x;
-		mcSelected.y = 260;
+		mcSelected.y = 110;
 		
 		var font = Res.Minecraftia.build(8, { antiAliasing : false } );
 		var texte = new h2d.Text(font, mcSelected);
